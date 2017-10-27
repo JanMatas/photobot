@@ -1,6 +1,7 @@
 build/
 bin/
 lib/
+devel/
 msg_gen/
 srv_gen/
 msg/*Action.msg
@@ -20,6 +21,8 @@ msg/_*.py
 # Ignore generated docs
 *.dox
 *.wikidoc
+.catkin_workspace
+*DS_Store
 
 # eclipse stuff
 .project

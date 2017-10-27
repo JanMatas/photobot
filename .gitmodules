@@ -1,0 +1,6 @@
+[submodule "src/rosaria"]
+	path = src/rosaria
+	url = https://github.com/amor-ros-pkg/rosaria.git
+[submodule "src/usb_cam"]
+	path = src/usb_cam
+	url = https://github.com/ros-drivers/usb_cam.git
