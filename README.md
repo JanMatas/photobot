@@ -10,3 +10,10 @@ We have 2 main branches:
 During our usual workflow, those branches are protected and we should never commit code there directly. Instead, we always create new branch named after the feature or bugfix it contains and it should be based on develop (example branch names: "camera-integration", "speech-synthesis-skeleton", "bugfix/display-overflow"). 
 
 After you are done, you should create a pull request to develop branch and ask someone else to review it. When the code is approved (and both the author and reviewer are convinced it works), we merge to develop. Every week (or as required), we take code on *develop*, test it properly and merge to *master*.
+
+## Dependencies:
+
+Some dependencies that need to be manually installed:
+
+- *pip packages* - gtts, playsound
+- *apt get* - libaria-dev, ffmpeg
