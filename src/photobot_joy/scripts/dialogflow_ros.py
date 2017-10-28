@@ -16,7 +16,7 @@ class DialogflowNode(object):
     """
     def __init__(self):
         rospy.init_node('dialogflow_node')
-        rospy.Subscriber("speech", String, self.speech_callback, queue_size=10)
+        rospy.Subscriber("speech_input", String, self.speech_callback, queue_size=10)
         try:
             self._client_access_token = "bc9d7b5841464fb8b17ce8ef89b11669" 
         except rospy.ROSException:
