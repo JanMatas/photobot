@@ -4,3 +4,6 @@
 [submodule "src/usb_cam"]
 	path = src/usb_cam
 	url = https://github.com/ros-drivers/usb_cam.git
+[submodule "src/face_detection"]
+	path = src/face_detection
+	url = https://github.com/paviii/face_detection.git
