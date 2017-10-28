@@ -27,6 +27,7 @@ class DialogflowNode(object):
 
         self.result_pub = rospy.Publisher("command", String, queue_size=10)
         self.speech_pub = rospy.Publisher("speech_output", String, queue_size=10)
+        self.picture_pub = rospy.Publisher("take_picture", String, queue_size=10) 
         self.request = None
 
     def speech_callback(self, msg):
@@ -43,6 +44,13 @@ class DialogflowNode(object):
         import json
         parsed = json.loads(response_string)
         response_string = parsed["result"]["fulfillment"]["speech"] 
+        try :
+             if 'wants-picture' in parsed["result"]["contexts"]["name"]:
+                  picture_object = String()
+                  picture_object.data = "trigger"
+                  self.picture_pub.publish(picture_object)
+        except:
+             pass
         print (response_string)
         self.result_pub.publish(result_msg)
         speech_object = String()
