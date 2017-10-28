@@ -15,5 +15,5 @@ After you are done, you should create a pull request to develop branch and ask s
 
 Some dependencies that need to be manually installed:
 
-- *pip packages* - gtts, playsound
+- *pip packages* - gtts, playsound, apiai
 - *apt get* - libaria-dev, ffmpeg
