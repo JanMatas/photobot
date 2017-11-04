@@ -22,3 +22,4 @@ Some dependencies that need to be manually installed:
 ### RosAria
 - Get the package from http://robots.mobilerobots.com/ARIA/download/current/libaria_2.9.1a+ubuntu16_amd64.deb
 - Install it with dpkg -i libaria_2.9.1a+ubuntu16_amd64.deb
+- Go to /usr/local/Aria and run `make clean; make`
