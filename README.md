@@ -40,5 +40,7 @@ ros-kinetic-map-server
 
 ## Running joystick
 `sudo chmod a+rwx /dev/input/js0`
+
 `rosrun joy joy_node _dev:=/dev/input/js0`
+
 `rosrun photobot_joy teleop.py`
