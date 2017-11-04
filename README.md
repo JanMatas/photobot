@@ -16,10 +16,29 @@ After you are done, you should create a pull request to develop branch and ask s
 Some dependencies that need to be manually installed:
 
 - *pip packages* - gtts, playsound, apiai
-- *apt get* - libaria-dev, ffmpeg
+- *apt get* - ffmpeg
 ### Camera
 - *apt* - ros-kinetic-image-common 
 ### RosAria
 - Get the package from http://robots.mobilerobots.com/ARIA/download/current/libaria_2.9.1a+ubuntu16_amd64.deb
 - Install it with dpkg -i libaria_2.9.1a+ubuntu16_amd64.deb
 - Go to /usr/local/Aria and run `make clean; make`
+### Navigation stack
+```
+ros-kinetic-move-base
+ros-kinetic-depthimage-to-laserscan
+ros-kinetic-slam-gmapping
+ros-kinetic-map-server
+```
+
+## Running RosAria
+`sudo chmod a+rwx /dev/ttyUSB0`
+
+`sudo chmod a+rwx /dev/ttyUSB1`
+
+`rosrun rosaria RosAria _port:=/dev/ttyUSB0` change to different USB if it doesn't work
+
+## Running joystick
+`sudo chmod a+rwx /dev/input/js0`
+`rosrun joy joy_node`
+`rosrun photobot_joy teleop.py`
