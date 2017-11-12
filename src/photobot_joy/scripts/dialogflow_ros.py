@@ -45,7 +45,7 @@ class DialogflowNode(object):
         parsed = json.loads(response_string)
         response_string = parsed["result"]["fulfillment"]["speech"] 
         try :
-             if 'wants-picture' in parsed["result"]["contexts"]["name"]:
+            if 'wants-picture' in map(lambda x: x["name"], parsed["result"]["contexts"]):
                   picture_object = String()
                   picture_object.data = "trigger"
                   self.picture_pub.publish(picture_object)
