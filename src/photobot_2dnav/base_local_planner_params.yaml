@@ -1,3 +1,4 @@
+# Responsible for sending commands to the robot given directions
 TrajectoryPlannerROS:
   max_vel_x: 0.45
   min_vel_x: 0.1
