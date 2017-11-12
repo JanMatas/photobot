@@ -5,6 +5,7 @@
 from __future__ import division
 import time
 import collections
+
 import re
 import sys
 import rospy
@@ -72,8 +73,10 @@ class SpeechRecognizer(object):
 
     def __init__(self):
         self.activated = False
+        self.stop_listening = False
         rospy.init_node('speech_input_node', disable_signals=True)
         self.pub = rospy.Publisher("speech_input", String, queue_size=10)
+        self.sub = rospy.Subscriber("speech_input_enable", Bool, self.speech_input_enable)
         self.client = speech.SpeechClient()
         config = types.RecognitionConfig(
             encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
@@ -106,6 +109,7 @@ class SpeechRecognizer(object):
             chunk = q.get()
             if chunk is None:
                 return
+            
             data.append(chunk)
             # Now consume whatever other data's still buffered.
             while True:
@@ -126,6 +130,8 @@ class SpeechRecognizer(object):
                    return
                else:
                    print "No voice detected but stream has not been used for 15 secs so there is no savings in closing it."
+            if self.stop_listening: 
+                return
             tail = max(0, tail - len(data))
             ret = b''.join(data)
             data = []
@@ -140,6 +146,9 @@ class SpeechRecognizer(object):
         with MicrophoneStream(RATE, CHUNK, q) as stream:
             while self.activated:   
                  window.append(q.get())
+                 if self.stop_listening:
+                     window = collections.deque(maxlen=10)
+                     continue
                  if self.rms(window[-1]) > 0.1:
                      print "Sound detected, opening stream."
                      audio_generator = self.chunk_generator(window, q, time.time())
@@ -148,7 +157,12 @@ class SpeechRecognizer(object):
                         for content in audio_generator)
                      response_generator = self.client.streaming_recognize(self.streaming_config, requests)
                      self.response_loop(response_generator)
-            
+    
+    def speech_input_enable(self, data):
+         print "listening is: "+ str(data.data)           
+         self.stop_listening = not data.data
+        
+           
     def stop(self):
         print "Waiting for thread to finish"
 
@@ -192,7 +206,7 @@ class SpeechRecognizer(object):
            time.sleep(1)
 
 import rospy
-from std_msgs.msg import String
+from std_msgs.msg import String, Bool
 
 
 
