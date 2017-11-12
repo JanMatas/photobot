@@ -8,6 +8,9 @@
   <!-- <include file="$(find amcl)/examples/amcl_omni.launch" /> -->
 
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <remap from="cmd_vel" to="RosAria/cmd_vel" />
+    <param name="conservative_reset_dist" value="0.5" />
+
     <rosparam file="$(find photobot_2dnav)/costmap_common_params.yaml" command="load" ns="global_costmap" />
     <rosparam file="$(find photobot_2dnav)/costmap_common_params.yaml" command="load" ns="local_costmap" />
     <rosparam file="$(find photobot_2dnav)/local_costmap_params.yaml" command="load" />
