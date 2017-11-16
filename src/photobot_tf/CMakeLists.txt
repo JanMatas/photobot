@@ -198,6 +198,7 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 add_executable(sonar_tf_broadcaster src/sonar_tf_broadcaster.cpp)
-add_executable(sonar_tf_listener src/sonar_tf_listener.cpp)
 target_link_libraries(sonar_tf_broadcaster ${catkin_LIBRARIES})
-target_link_libraries(sonar_tf_listener ${catkin_LIBRARIES})
+
+add_executable(laser_tf_broadcaster src/laser_tf_broadcaster.cpp)
+target_link_libraries(laser_tf_broadcaster ${catkin_LIBRARIES})

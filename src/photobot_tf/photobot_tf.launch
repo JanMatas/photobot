@@ -1,0 +1,5 @@
+<launch>
+  <master auto="start"/>
+  <node pkg="photobot_tf" type="photobot_tf" name="sonar_tf_broadcaster" output="screen" />
+  <node pkg="photobot_tf" type="photobot_tf" name="laser_tf_broadcaster" output="screen" />
+</launch>
