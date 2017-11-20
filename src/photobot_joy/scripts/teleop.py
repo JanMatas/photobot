@@ -19,7 +19,7 @@ def listener():
     # run simultaneously.
     rospy.init_node('listener', anonymous=True)
     global pub
-    pub = rospy.Publisher('RosAria/cmd_vel', Twist)
+    pub = rospy.Publisher('RosAria/cmd_vel', Twist, queue_size=10)
     rospy.Subscriber('joy', Joy, callback)
 
     # spin() simply keeps python from exiting until this node is stopped
