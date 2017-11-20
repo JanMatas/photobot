@@ -6,16 +6,16 @@
   <arg name="face_cascade_name_4"  default="$(find face_detection)/include/face_detection/lbpCascades/lbpcascade_frontalface.xml" />
 
     <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" >
-	    <param name="video_device" value="/dev/video0" />
-	    <param name="image_width" value="640" />
-	    <param name="image_height" value="480" />
-	    <param name="pixel_format" value="yuyv" />
-	    <param name="camera_frame_id" value="usb_cam" />
-	    <param name="io_method" value="mmap"/>
+      <param name="video_device" value="/dev/video0" />
+      <param name="image_width" value="640" />
+      <param name="image_height" value="480" />
+      <param name="pixel_format" value="yuyv" />
+      <param name="camera_frame_id" value="usb_cam" />
+      <param name="io_method" value="mmap"/>
     </node>
-	  <node name="image_view" pkg="image_view" type="image_view" respawn="false" output="screen">
-	    <remap from="image" to="/usb_cam/image_raw"/>
-	    <param name="autosize" value="true" />
+    <node name="image_view" pkg="image_view" type="image_view" respawn="false" output="screen">
+      <remap from="image" to="/usb_cam/image_raw"/>
+      <param name="autosize" value="true" />
   </node>
 
   <node pkg="face_detection" type="face_detection" name="face_detection"
@@ -26,4 +26,12 @@
       $(arg face_cascade_name_4)"
       output="screen"/>
       <remap from="/camera/image_raw" to="/usb_cam/image_raw" />
+
+
+  <node name="speech_input_stream" pkg="photobot_joy" type="speech_input_stream"> </node>
+  <node name="speech_output" pkg="photobot_joy" type="speech_output"> </node>
+  <node name="dialogFlowState" pkg="photobot_joy" type="dialogFlowState"> </node>
+  <node name="ui_transfer" pkg="photobot_joy" type="ui"> </node>
+  <node name="cam_saver" pkg="photobot_joy" type="cam_saver"> </node>
+
 </launch>

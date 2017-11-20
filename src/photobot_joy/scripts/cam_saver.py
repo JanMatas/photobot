@@ -16,40 +16,68 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 # OpenCV2 for saving an image
 import cv2
-global triggered
-triggered = False
-from sensor_msgs.msg import Joy
-def joy_callback(data):
-	global triggered
-	if data.buttons[0]:
-		print ("Triggered")
-		triggered = True
+
+from std_msgs.msg import String
+
+
+
+
+
+
+
+class CamSaver(object):
+
+    def __init__(self):
+        rospy.init_node('cam_saver')
+        # Define your image topic
+        image_topic = "/usb_cam/image_raw"
+        trigger_topic = "/event_output"
+        # Set up your subscriber and define its callback
+        rospy.Subscriber(image_topic, Image, image_callback)
+        rospy.Subscriber(trigger_topic, String, trigger_callback)
+        self.event_trigger = rospy.Publisher("/event_trigger", String)
+        self.ui_publish = rospy.Publisher("/image_ui", Image)
+
+
+        self.bridge = CvBridge()
+        self.last_image = None
+
+
+
+
+    def image_callback(self, msg):
+
+        self.last_image = msg
+
+    def trigger_callback(self, _msg):
+        if not "photo" in _msg.data:
+            print ("Received unknown trigger")
+            return
+        print("Received trigger!")
+        if not self.last_image:
+            print("No image received yet, trigger failed")
+            return
+        msg = self.last_image
+
+        
+        try:    
+            # Convert your ROS Image message to OpenCV2
+            cv2_img = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+
+        except CvBridgeError, e:
+            print(e)
+        else:
+            # Save your OpenCV2 image as a jpeg 
+            cv2.imwrite('camera_image.jpeg', cv2_img)
+            self.event_trigger.publish("Photo taken")
+            self.ui_publish.publish(msg)
+
 
 # Instantiate CvBridge
-bridge = CvBridge()
-def image_callback(msg):
-    global triggered
-    if not triggered:
-        return
-    print("Received an image!")
-    try:	
-        # Convert your ROS Image message to OpenCV2
-        cv2_img = bridge.imgmsg_to_cv2(msg, "bgr8")
 
-    except CvBridgeError, e:
-        print(e)
-    else:
-        # Save your OpenCV2 image as a jpeg 
-        cv2.imwrite('camera_image.jpeg', cv2_img)
-        triggered=False
+
 def main():
-    rospy.init_node('cam_saver')
-    # Define your image topic
-    image_topic = "/usb_cam/image_raw"
-    # Set up your subscriber and define its callback
-    rospy.Subscriber('joy', Joy, joy_callback)
-    rospy.Subscriber(image_topic, Image, image_callback)
-    # Spin until ctrl + c
+    CamSaver()
     rospy.spin()
 
 if __name__ == '__main__':

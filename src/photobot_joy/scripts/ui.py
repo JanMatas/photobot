@@ -10,7 +10,7 @@ class UiPublisher(object):
     def __init__(self):
         self.imagePub = rospy.Publisher("/image_base64", String)
         self.bridge = CvBridge()
-        self.image_sub = rospy.Subscriber("/usb_cam/image_raw",Image,self.callback)#/camera/rgb/image_color
+        self.image_sub = rospy.Subscriber("/image_ui",Image,self.callback)#/camera/rgb/image_color
         self.counter = 0
     def callback(self, msg):
 
