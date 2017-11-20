@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import cv2
+import base64
 import rospy
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
@@ -16,7 +17,7 @@ class UiPublisher(object):
         try:
             cv2_img = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             import cv2
-            retval, buffer = cv2.imencode('.jpg', image)
+            retval, buffer = cv2.imencode('.jpg', cv2_img)
             jpg_as_text = base64.b64encode(buffer)
             self.imagePub.publish(str(jpg_as_text))
         except CvBridgeError, e:
@@ -24,6 +25,7 @@ class UiPublisher(object):
 
 def main():
     rospy.init_node('ui')
+    UiPublisher()
     rospy.spin()
 
 if __name__ == '__main__':
