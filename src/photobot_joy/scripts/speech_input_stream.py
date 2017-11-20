@@ -99,7 +99,6 @@ class SpeechRecognizer(object):
         for sample in shorts:
             n = sample * (1.0/32768)
             sum_squares += n*n
-        print "rms: " + str(math.sqrt( sum_squares / count) )
         return math.sqrt( sum_squares / count )
 #
     def chunk_generator(self, window, q, init_time):
@@ -147,6 +146,7 @@ class SpeechRecognizer(object):
             while self.activated:   
                  window.append(q.get())
                  if self.stop_listening:
+                     print "not listening"
                      window = collections.deque(maxlen=10)
                      continue
                  if self.rms(window[-1]) > 0.1:
@@ -157,7 +157,8 @@ class SpeechRecognizer(object):
                         for content in audio_generator)
                      response_generator = self.client.streaming_recognize(self.streaming_config, requests)
                      self.response_loop(response_generator)
-    
+                     continue
+                 print "silent chunk"
     def speech_input_enable(self, data):
          print "listening is: "+ str(data.data)           
          self.stop_listening = not data.data
