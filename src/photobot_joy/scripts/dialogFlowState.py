@@ -44,6 +44,16 @@ class DialogflowNode(object):
             event_object = String()
             event_object.data = trigger_msg
             self.event_pub.publish(event_object)
+        if (action == "apply_filter"):
+            trigger_msg = "Apply filter, type: " + parsed["result"]["parameters"]["filter_type"]
+            print (trigger_msg)
+            event_object = String()
+            event_object.data = trigger_msg
+            self.event_pub.publish(event_object)
+        if (action == "send_email"):
+            event_object = String()
+            event_object.data = "Send email"
+            self.event_pub.publish(event_object)
 
         speech_object = String()
         speech_object.data = response_string
