@@ -43,6 +43,7 @@ def listener():
 
 # talker
 def talker():
+    print "ahoj"
     pub = rospy.Publisher('chatter', String, queue_size=10)
     rospy.init_node('talker', anonymous=True)
     rate = rospy.Rate(10) # 10hz
