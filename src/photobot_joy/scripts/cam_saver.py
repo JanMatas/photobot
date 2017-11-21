@@ -33,8 +33,8 @@ class CamSaver(object):
         image_topic = "/usb_cam/image_raw"
         trigger_topic = "/event_output"
         # Set up your subscriber and define its callback
-        rospy.Subscriber(image_topic, Image, image_callback)
-        rospy.Subscriber(trigger_topic, String, trigger_callback)
+        rospy.Subscriber(image_topic, Image, self.image_callback)
+        rospy.Subscriber(trigger_topic, String,self.trigger_callback)
         self.event_trigger = rospy.Publisher("/event_trigger", String)
         self.ui_publish = rospy.Publisher("/image_ui", Image)
 
@@ -68,7 +68,7 @@ class CamSaver(object):
             print(e)
         else:
             # Save your OpenCV2 image as a jpeg 
-            cv2.imwrite('camera_image.jpeg', cv2_img)
+            cv2.imwrite('/home/human4/photobot/camera_image.jpeg', cv2_img)
             self.event_trigger.publish("Photo taken")
             self.ui_publish.publish(msg)
 

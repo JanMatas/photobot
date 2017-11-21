@@ -149,7 +149,8 @@ class SpeechRecognizer(object):
                      print "not listening"
                      window = collections.deque(maxlen=10)
                      continue
-                 if self.rms(window[-1]) > 0.1:
+                 print "rms " + str(self.rms(window[-1]))
+                 if self.rms(window[-1]) > 0.01:
                      print "Sound detected, opening stream."
                      audio_generator = self.chunk_generator(window, q, time.time())
                      window = collections.deque(maxlen=10)

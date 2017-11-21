@@ -4,7 +4,7 @@ import rospy
 from std_msgs.msg import String, Int32MultiArray
 from collections import deque
 
-pub = rospy.Publisher('face_detect', String, queue_size=10)
+pub = rospy.Publisher('event_trigger', String, queue_size=10)
 # rospy.init_node('talker', anonymous=True)
 
 buffer = deque(maxlen=100)

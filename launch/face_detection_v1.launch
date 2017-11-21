@@ -28,10 +28,13 @@
       <remap from="/camera/image_raw" to="/usb_cam/image_raw" />
 
 
-  <node name="speech_input_stream" pkg="photobot_joy" type="speech_input_stream"> </node>
-  <node name="speech_output" pkg="photobot_joy" type="speech_output"> </node>
-  <node name="dialogFlowState" pkg="photobot_joy" type="dialogFlowState"> </node>
-  <node name="ui_transfer" pkg="photobot_joy" type="ui"> </node>
-  <node name="cam_saver" pkg="photobot_joy" type="cam_saver"> </node>
+  <node name="speech_input" pkg="photobot_joy" type="speech_input_stream.py"> </node>
+  <node name="speech_output" pkg="photobot_joy" type="speech_output.py"> </node>
+  <node name="dialogFlowState" pkg="photobot_joy" type="dialogFlowState.py"> </node>
+  <node name="ui_transfer" pkg="photobot_joy" type="ui.py"> </node>
+  <node name="cam_saver" pkg="photobot_joy" type="cam_saver.py"> </node>
+  <node name="emailer" pkg="central_node" type="emailer.py"> </node>
+  <node name="wait_for_face" pkg="central_node" type="wait_for_face.py"> </node>
+
 
 </launch>
