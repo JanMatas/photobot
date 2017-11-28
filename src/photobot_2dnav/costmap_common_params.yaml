@@ -10,8 +10,8 @@ observation_sources: laser_scan_sensor
 # observation_sources: point_cloud_sensor
 
 # point_cloud_sensor: {sensor_frame: sonar,
-#                      data_type: PointCloud, topic_name: /Rosaria/sonar,
-#                      # data_type: PointCloud2, topic_name: /Rosaria/sonar_pointcloud2,
+#                      data_type: PointCloud, topic_name: /RosAria/sonar,
+#                      # data_type: PointCloud2, topic_name: /RosAria/sonar_pointcloud2,
 #                      marking: true, clearing: true}
 
 laser_scan_sensor: {sensor_frame: laser,
