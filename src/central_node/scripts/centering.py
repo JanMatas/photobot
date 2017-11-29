@@ -15,7 +15,7 @@ class CenteringNode(object):
     """
     def __init__(self):
         rospy.init_node('centering_node')
-        rospy.Subscriber("/faceCoord", Int32MultiArray, self.callback, queue_size=10)
+        rospy.Subscriber("/filter_faceCoord", Int32MultiArray, self.callback, queue_size=10)
       
 
         self.result_pub = rospy.Publisher("RosAria/cmd_vel", Twist, queue_size=10)
@@ -28,10 +28,11 @@ class CenteringNode(object):
         
         data = msg.data
         twist = Twist()
+        numOfFaces = data[1]
         #twist.linear.x = 4*data.axes[1]
         #twist.angular.z = 4*data.axes[0]
 
-        if data[1] == 1:
+        if numOfFaces == 1:
             
             width = data[8]
             faceCenter_x = data[6] + data[8]/2
@@ -56,6 +57,39 @@ class CenteringNode(object):
                     self.result_pub.publish(twist)
                 else:
                     self.result_pub.publish(twist)
+
+        elif numOfFaces > 1:
+            meanFaceCenter_x = 0.0
+            leftMost = data[2]
+            rightMost = 0 
+            for i in range(numOfFaces):
+                thisCenter = data[6 + 6*i] + data[8 + 6*i]/2.0       
+                meanFaceCenter_x += thisCenter/numOfFaces
+                if thisCenter > rightMost:
+                    rightMost = thisCenter
+                if thisCenter < leftMost:
+                    leftMost = thisCenter
+            
+            left_x = data[2]/3
+            right_x = 2*data[2]/3
+
+            if meanFaceCenter_x < left_x:
+                twist.linear.x = 0.05
+                twist.angular.z = 3
+                self.result_pub.publish(twist)
+                
+            elif meanFaceCenter_x > right_x:
+                twist.linear.x = 0.05
+                twist.angular.z = -3
+                self.result_pub.publish(twist)
+
+            else:
+                if(leftMost > (data[2]/5) and rightMost < (4*data[2]/5)):
+                    #cuvaj
+                    twist.linear.x = -0.1
+                else:
+                    twist.linear.x = 0.0        
+                self.result_pub.publish(twist)
 
         else:
             self.result_pub.publish(twist)
