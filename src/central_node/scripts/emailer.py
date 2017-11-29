@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import smtplib
 import os
-
+import re
 # For guessing MIME type
 import mimetypes
 
@@ -18,6 +18,9 @@ from std_msgs.msg import String
 def callback(data):
     rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
     if 'Send email' in data.data:
+        if len(data.data.split()) != 3 or not re.match(r"[^@]+@[^@]+\.[^@]+",  data.data.split()[2]):
+            print ("bad addresss entered")
+            return
         address = data.data.split()[2]
         send_from = 'photobot.picture@gmail.com'
         send_to = address
@@ -33,7 +36,7 @@ def callback(data):
         body = email.mime.Text.MIMEText(text)
         msg.attach(body)
 
-        filename='/home/human4/photobot/camera_image.jpeg'
+        filename='/tmp/camera_image.jpeg'
         img_data = open(filename, 'rb').read()
         image = MIMEImage(img_data, name=os.path.basename(filename))
         msg.attach(image)

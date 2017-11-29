@@ -9,7 +9,7 @@
 	    <param name="video_device" value="/dev/video0" />
 	    <param name="image_width" value="640" />
 	    <param name="image_height" value="480" />
-	    <param name="pixel_format" value="yuyv" />
+	    <param name="pixel_format" value="mjpeg" />
 	    <param name="camera_frame_id" value="usb_cam" />
 	    <param name="io_method" value="mmap"/>
     </node>
@@ -18,7 +18,7 @@
     <param name="autosize" value="true" />
   </node>
 
-  <node pkg="face_detection" type="face_detection" name="face_detection"
+  <node pkg="face_detection" type="face_tracking" name="face_tracking"
       args="$(arg face_cascade_name_0)
       $(arg face_cascade_name_1)
       $(arg face_cascade_name_2)
@@ -27,12 +27,11 @@
       output="screen">
       <remap from="/camera/image_raw" to="/usb_cam/image_raw" />
   </node>
-  <node pkg="rosaria" name="RosAria" type="RosAria" > 
+<!--  <node pkg="rosaria" name="RosAria" type="RosAria" > 
     <param name="port" value="/dev/ttyUSB1"/>
-   </node>
+   </node> -->
 
-<!--   <node pkg="central_node" name="central_node2" type="cam_saver.py" />  -->
-  <node pkg="photobot_joy" name="speech_flow" type="dialogflow_ros.py" />
+  <node pkg="photobot_joy" name="photobot_joy" type="cam_saver.py" />  -->
   <node pkg="photobot_joy" name="speech_output" type="speech_output.py" />
   <node name="speech_input" pkg="photobot_joy" type="speech_input_stream.py"> </node>
     <node name="dialogFlowState" pkg="photobot_joy" type="dialogFlowState.py"> </node>
@@ -45,7 +44,9 @@
 
 
 
-
+  <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" > 
+     <arg name="port" value="9091"/>
+  </include>
 
 
 </launch>

@@ -119,7 +119,7 @@ class SpeechRecognizer(object):
                     data.append(chunk)
                 except queue.Empty:
                     break
-            if sum(map(self.rms, data)) / len(data) >  0.1:
+            if sum(map(self.rms, data)) / len(data) >  0.01:
                tail = TAIL
             
             if tail == 0:

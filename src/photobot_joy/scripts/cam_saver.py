@@ -68,7 +68,8 @@ class CamSaver(object):
             print(e)
         else:
             # Save your OpenCV2 image as a jpeg 
-            cv2.imwrite('/home/human4/photobot/camera_image.jpeg', cv2_img)
+            print("photo taken")
+            cv2.imwrite('/tmp/camera_image.jpeg', cv2_img)
             self.event_trigger.publish("Photo taken")
             self.ui_publish.publish(msg)
 
