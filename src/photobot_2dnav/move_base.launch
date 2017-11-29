@@ -5,10 +5,11 @@
   <!-- <node name="map_server" pkg="map_server" type="map_server" args="$(find my_map_package)/lab_map.pgm my_map_resolution"/> -->
 
   <!--- Run AMCL -->
-  <!-- <include file="$(find amcl)/examples/amcl_omni.launch" /> -->
+  <include file="$(find amcl)/examples/amcl_diff.launch" />
 
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
     <remap from="cmd_vel" to="RosAria/cmd_vel" />
+    <remap from="odom" to="RosAria/pose" />
     <param name="conservative_reset_dist" value="0.5" />
 
     <rosparam file="$(find photobot_2dnav)/costmap_common_params.yaml" command="load" ns="global_costmap" />
@@ -17,4 +18,5 @@
     <rosparam file="$(find photobot_2dnav)/global_costmap_params.yaml" command="load" />
     <rosparam file="$(find photobot_2dnav)/base_local_planner_params.yaml" command="load" />
   </node>
+  <!-- <node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0 0 0.0 /map /odom 100"/> -->
 </launch>
