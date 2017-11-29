@@ -12,10 +12,10 @@ class SpeechInput(object):
         rospy.Subscriber("speech_input_enable", Bool, self.speech_input_enable)
         self.r = sr.Recognizer()
         self.m = sr.Microphone()
-        rospy.logdebug("Calibrating...")
+        rospy.loginfo("Calibrating...")
         with self.m as source:
             self.r.adjust_for_ambient_noise(source)
-        rospy.logdebug("Done calibration")
+        rospy.loginfo("Done calibration")
         
         self.stop_listening = self.r.listen_in_background(self.m, self.callback)
 
@@ -28,6 +28,7 @@ class SpeechInput(object):
 
     def callback(self,recognizer, audio):
         print "audio in"
+        rospy.loginfo("Audio received")
         try:
             recognized_speech =  recognizer.recognize_google(audio)
             speech_input_msg = String()
@@ -35,9 +36,9 @@ class SpeechInput(object):
             self.pub.publish(speech_input_msg)
 
         except sr.UnknownValueError:
-            print("Google Speech Recognition could not understand audio")
+            rospy.loginfo("Google Speech Recognition could not understand audio")
         except sr.RequestError as e:
-            print("Could not request results from Google Speech Recognition service; {0}".format(e))
+            rospy.loginfo("Could not request results from Google Speech Recognition service; {0}".format(e))
     
     def __del__(self):
         #TODO Make sure this is ok!

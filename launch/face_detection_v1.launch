@@ -6,16 +6,16 @@
   <arg name="face_cascade_name_4"  default="$(find face_detection)/include/face_detection/lbpCascades/lbpcascade_frontalface.xml" />
 
     <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" >
-      <param name="video_device" value="/dev/video0" />
-      <param name="image_width" value="640" />
-      <param name="image_height" value="480" />
-      <param name="pixel_format" value="yuyv" />
-      <param name="camera_frame_id" value="usb_cam" />
-      <param name="io_method" value="mmap"/>
+	    <param name="video_device" value="/dev/video0" />
+	    <param name="image_width" value="640" />
+	    <param name="image_height" value="480" />
+	    <param name="pixel_format" value="yuyv" />
+	    <param name="camera_frame_id" value="usb_cam" />
+	    <param name="io_method" value="mmap"/>
     </node>
-    <node name="image_view" pkg="image_view" type="image_view" respawn="false" output="screen">
-      <remap from="image" to="/usb_cam/image_raw"/>
-      <param name="autosize" value="true" />
+  <node name="image_view" pkg="image_view" type="image_view" respawn="false" output="screen">
+    <remap from="image" to="/usb_cam/image_raw"/>
+    <param name="autosize" value="true" />
   </node>
 
   <node pkg="face_detection" type="face_detection" name="face_detection"
@@ -24,17 +24,28 @@
       $(arg face_cascade_name_2)
       $(arg face_cascade_name_3)
       $(arg face_cascade_name_4)"
-      output="screen"/>
+      output="screen">
       <remap from="/camera/image_raw" to="/usb_cam/image_raw" />
+  </node>
+  <node pkg="rosaria" name="RosAria" type="RosAria" > 
+    <param name="port" value="/dev/ttyUSB1"/>
+   </node>
 
-
+<!--   <node pkg="central_node" name="central_node2" type="cam_saver.py" />  -->
+  <node pkg="photobot_joy" name="speech_flow" type="dialogflow_ros.py" />
+  <node pkg="photobot_joy" name="speech_output" type="speech_output.py" />
   <node name="speech_input" pkg="photobot_joy" type="speech_input_stream.py"> </node>
-  <node name="speech_output" pkg="photobot_joy" type="speech_output.py"> </node>
-  <node name="dialogFlowState" pkg="photobot_joy" type="dialogFlowState.py"> </node>
-  <node name="ui_transfer" pkg="photobot_joy" type="ui.py"> </node>
-  <node name="cam_saver" pkg="photobot_joy" type="cam_saver.py"> </node>
-  <node name="emailer" pkg="central_node" type="emailer.py"> </node>
-  <node name="wait_for_face" pkg="central_node" type="wait_for_face.py"> </node>
+    <node name="dialogFlowState" pkg="photobot_joy" type="dialogFlowState.py"> </node>
+    <node name="ui_transfer" pkg="photobot_joy" type="ui.py"> </node>
+    <node name="emailer" pkg="central_node" type="emailer.py"> </node>
+  <!--   <node pkg="photobot_joy" name="teleop" type="teleop.py" />
+  <node pkg="joy" name="joystick" type="joy_node" >
+	<param name="joy_node/dev" value="/dev/input/js0" />
+  </node> -->
+
+
+
+
 
 
 </launch>
