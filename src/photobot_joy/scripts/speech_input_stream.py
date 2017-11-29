@@ -3,6 +3,8 @@
 
 # [START import_libraries]
 from __future__ import division
+import time
+import collections
 
 import re
 import sys
@@ -11,24 +13,25 @@ from google.cloud import speech
 from google.cloud.speech import enums
 from google.cloud.speech import types
 import pyaudio
+import threading
+import math
+import struct
 from six.moves import queue
 # [END import_libraries]
 
 # Audio recording parameters
 RATE = 16000
 CHUNK = int(RATE / 10)  # 100ms
-
+TAIL = 30
 
 class MicrophoneStream(object):
-    """Opens a recording stream as a generator yielding the audio chunks."""
-    def __init__(self, rate, chunk, pub):
+    def __init__(self, rate, chunk, queue):
         self._rate = rate
         self._chunk = chunk
-
-        # Create a thread-safe buffer of audio data
-        self._buff = queue.Queue()
-        self.pub = pub
+        self._buff = queue
         self.closed = True
+        self.tail = TAIL
+
 
     def __enter__(self):
         self._audio_interface = pyaudio.PyAudio()
@@ -62,111 +65,156 @@ class MicrophoneStream(object):
         self._buff.put(in_data)
         return None, pyaudio.paContinue
 
-    def generator(self):
-        while not self.closed:
-            # Use a blocking get() to ensure there's at least one chunk of
-            # data, and stop iteration if the chunk is None, indicating the
-            # end of the audio stream.
-            chunk = self._buff.get()
+# [END audio_stream]
+
+
+
+class SpeechRecognizer(object):
+
+    def __init__(self):
+        self.activated = False
+        self.stop_listening = False
+        rospy.init_node('speech_input_node', disable_signals=True)
+        self.pub = rospy.Publisher("speech_input", String, queue_size=10)
+        self.sub = rospy.Subscriber("speech_input_enable", Bool, self.speech_input_enable)
+        self.client = speech.SpeechClient()
+        config = types.RecognitionConfig(
+            encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
+            sample_rate_hertz=RATE,
+            language_code='en-us'
+        )
+        self.streaming_config = types.StreamingRecognitionConfig(
+            config=config,
+            interim_results=False
+        )
+        self.thread_handle = None
+
+    def rms(self, data):
+        if not data:
+            return 0
+        count = len(data)/2
+        format = "%dh"%(count)
+        shorts = struct.unpack( format, data )
+        sum_squares = 0.0
+        for sample in shorts:
+            n = sample * (1.0/32768)
+            sum_squares += n*n
+        return math.sqrt( sum_squares / count )
+#
+    def chunk_generator(self, window, q, init_time):
+        tail = TAIL
+        data = list(window)
+        while True:
+            chunk = q.get()
             if chunk is None:
                 return
-            data = [chunk]
-
+            
+            data.append(chunk)
             # Now consume whatever other data's still buffered.
             while True:
                 try:
-                    chunk = self._buff.get(block=False)
+                    chunk = q.get(block=False)
                     if chunk is None:
                         return
                     data.append(chunk)
                 except queue.Empty:
                     break
+            if sum(map(self.rms, data)) / len(data) >  0.1:
+               tail = TAIL
+            
+            if tail == 0:
+               time_since_init = time.time() - init_time
+               if time_since_init > 15:
+                   print "No voice detected, closing unused stream."
+                   return
+               else:
+                   print "No voice detected but stream has not been used for 15 secs so there is no savings in closing it."
+            if self.stop_listening: 
+                return
+            tail = max(0, tail - len(data))
+            ret = b''.join(data)
+            data = []
+            yield ret
 
-            yield b''.join(data)
-# [END audio_stream]
+    def start_thread(self):
+        q = queue.Queue()
+
+  
+        window = collections.deque(maxlen=10)
+        self.activated = True
+        with MicrophoneStream(RATE, CHUNK, q) as stream:
+            while self.activated:   
+                 window.append(q.get())
+                 if self.stop_listening:
+                     print "not listening"
+                     window = collections.deque(maxlen=10)
+                     continue
+                 print "rms " + str(self.rms(window[-1]))
+                 if self.rms(window[-1]) > 0.01:
+                     print "Sound detected, opening stream."
+                     audio_generator = self.chunk_generator(window, q, time.time())
+                     window = collections.deque(maxlen=10)
+                     requests = (types.StreamingRecognizeRequest(audio_content=content)
+                        for content in audio_generator)
+                     response_generator = self.client.streaming_recognize(self.streaming_config, requests)
+                     self.response_loop(response_generator)
+                     continue
+                 print "silent chunk"
+    def speech_input_enable(self, data):
+         print "listening is: "+ str(data.data)           
+         self.stop_listening = not data.data
+        
+           
+    def stop(self):
+        print "Waiting for thread to finish"
+
+        self.activated = False 
+        self.thread_handle.join()
+
+        print "Thread finished"
 
 
-def listen_print_loop(responses, pub):
-    """Iterates through server responses and prints them.
 
-    The responses passed is a generator that will block until a response
-    is provided by the server.
+    def response_loop(self, responses):
+       for response in responses:
+           print "response"           
+           if not self.activated:
+               return
+           if not response.results:
+               continue
 
-    Each response may contain multiple results, and each result may contain
-    multiple alternatives; for details, see https://goo.gl/tjCPAU.  Here we
-    print only the transcription for the top alternative of the top result.
+           result = response.results[0]
+           if not result.alternatives:
+               continue
 
-    In this case, responses are provided for interim results as well. If the
-    response is an interim one, print a line feed at the end of it, to allow
-    the next result to overwrite it, until the response is a final one. For the
-    final one, print a newline to preserve the finalized transcription.
-    """
-    num_chars_printed = 0
-    for response in responses:
-        if not response.results:
-            continue
+           transcript = result.alternatives[0].transcript
 
-        # The `results` list is consecutive. For streaming, we only care about
-        # the first result being considered, since once it's `is_final`, it
-        # moves on to considering the next utterance.
-        result = response.results[0]
-        if not result.alternatives:
-            continue
+           speech_input_msg = String()
+           speech_input_msg.data = transcript 
+           self.pub.publish(speech_input_msg)
 
-        # Display the transcription of the top alternative.
-        transcript = result.alternatives[0].transcript
-
-        # Display interim results, but with a carriage return at the end of the
-        # line, so subsequent lines will overwrite them.
-        #
-        # If the previous result was longer than this one, we need to print
-        # some extra spaces to overwrite the previous result
-        overwrite_chars = ' ' * (num_chars_printed - len(transcript))
-
-        if not result.is_final:
-            sys.stdout.write(transcript + overwrite_chars + '\r')
-            sys.stdout.flush()
-
-            num_chars_printed = len(transcript)
-
-        else:
-            print(transcript + overwrite_chars)
-            speech_input_msg = String()
-            speech_input_msg.data = transcript 
-            pub.publish(speech_input_msg)
-            num_chars_printed = 0
-
+    def start_waiting(self):
+       while True:
+           print "loop"
+           if self.pub.get_num_connections() == 0 and self.activated:
+               print "No subscribers, stopping!"
+               self.stop()
+           if self.pub.get_num_connections() > 0 and not self.thread_handle:
+               self.thread_handle = threading.Thread(name='daemon', target=self.start_thread)
+               self.thread_handle.setDaemon(True)
+               self.activated = True
+               self.thread_handle.start()             
+               print "Subscriber connected, started thread"
+           time.sleep(1)
 
 import rospy
-from std_msgs.msg import String
+from std_msgs.msg import String, Bool
 
 
 
-
-def main():
-    # See http://g.co/cloud/speech/docs/languages
-    # for a list of supported languages.
-    language_code = 'en-US'  # a BCP-47 language tag
-    rospy.init_node('speech_input_node')
-    pub = rospy.Publisher("speech_input", String, queue_size=10)
-    client = speech.SpeechClient()
-    config = types.RecognitionConfig(
-        encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
-        sample_rate_hertz=RATE,
-        language_code=language_code)
-    streaming_config = types.StreamingRecognitionConfig(
-        config=config,
-        interim_results=True)
-
-    with MicrophoneStream(RATE, CHUNK, pub) as stream:
-        audio_generator = stream.generator()
-        requests = (types.StreamingRecognizeRequest(audio_content=content)
-                    for content in audio_generator)
-
-        responses = client.streaming_recognize(streaming_config, requests)
-        # Now, put the transcription responses to use.
-        listen_print_loop(responses, pub)
 
 
 if __name__ == '__main__':
-    main()
+   
+    sr = SpeechRecognizer()
+    sr.start_waiting()

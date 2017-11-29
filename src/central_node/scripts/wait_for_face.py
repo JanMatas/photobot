@@ -4,8 +4,9 @@ import rospy
 from std_msgs.msg import String, Int32MultiArray
 from collections import deque
 
-#pub = rospy.Publisher('face_detect', String, queue_size=10)
+
 pub = rospy.Publisher('speech_input', String, queue_size=10)
+
 # rospy.init_node('talker', anonymous=True)
 
 buffer = deque(maxlen=100)
@@ -44,7 +45,6 @@ def listener():
 
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
-
 
 if __name__ == '__main__':
     try:

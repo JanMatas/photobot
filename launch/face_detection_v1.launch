@@ -27,19 +27,25 @@
       output="screen">
       <remap from="/camera/image_raw" to="/usb_cam/image_raw" />
   </node>
+  <node pkg="rosaria" name="RosAria" type="RosAria" > 
+    <param name="port" value="/dev/ttyUSB1"/>
+   </node>
 
-  <node pkg="central_node" name="central_node1" type="wait_for_face.py" output="screen" />
-  <node pkg="central_node" name="central_node2" type="cam_saver.py" /> 
+<!--   <node pkg="central_node" name="central_node2" type="cam_saver.py" />  -->
   <node pkg="photobot_joy" name="speech_flow" type="dialogflow_ros.py" />
   <node pkg="photobot_joy" name="speech_output" type="speech_output.py" />
-  <node pkg="rosaria" name="RosAria" type="RosAria" > 
-
-	    <param name="port" value="/dev/ttyUSB1"/>
-  </node>
-
-  <node pkg="photobot_joy" name="speech_input" type="speech_input.py" output="screen"/>
-  <node pkg="photobot_joy" name="teleop" type="teleop.py" />
+  <node name="speech_input" pkg="photobot_joy" type="speech_input_stream.py"> </node>
+    <node name="dialogFlowState" pkg="photobot_joy" type="dialogFlowState.py"> </node>
+    <node name="ui_transfer" pkg="photobot_joy" type="ui.py"> </node>
+    <node name="emailer" pkg="central_node" type="emailer.py"> </node>
+  <!--   <node pkg="photobot_joy" name="teleop" type="teleop.py" />
   <node pkg="joy" name="joystick" type="joy_node" >
 	<param name="joy_node/dev" value="/dev/input/js0" />
-  </node>
+  </node> -->
+
+
+
+
+
+
 </launch>
