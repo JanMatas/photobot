@@ -14,7 +14,7 @@ retries = 1
 unmount_cmd = 'gvfs-mount -s gphoto2'
 
 #libgphoto2dll = 'libgphoto2.so.2.4.0'
-libgphoto2dll = 'libgphoto2.6.dylib'
+libgphoto2dll = 'libgphoto2.so'
 # 2.4.6
 #libgphoto2dll = '/usr/lib/libgphoto2.so'
 # 2.4.8
@@ -483,13 +483,11 @@ class cameraList(object):
     def __init__(self, autodetect=False):
         self._l = ctypes.c_void_p()
         check(gp.gp_list_new(PTR(self._l)))
-        #print"We got here1"
+
         if autodetect == True:
             if hasattr(gp, 'gp_camera_autodetect'):
-                #print"First branch"
                 gp.gp_camera_autodetect(self._l, context)
             else:
-                print"Second branch"
                 # this is for stable versions of gphoto <= 2.4.10.1
                 xlist = cameraList()
                 il = portInfoList()

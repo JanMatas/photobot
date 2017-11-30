@@ -32,8 +32,8 @@ class CamSaver(object):
         # Define your image topic
         trigger_topic = "/event_output"
         # Set up your subscriber and define its callback
-        rospy.Subscriber(trigger_topic, String,self.trigger_callback)
-        self.event_trigger = rospy.Publisher("/event_trigger", String)
+        rospy.Subscriber(trigger_topic, String,self.trigger_callback,queue_size=10)
+        self.event_trigger = rospy.Publisher("/event_trigger", String, queue_size=10)
         #self.ui_publish = rospy.Publisher("/image_ui", Image)
 
 
@@ -46,9 +46,10 @@ class CamSaver(object):
 
         try:    
         	# Convert your ROS Image message to OpenCV2
-			C = piggyphoto.camera()
-			print C.abilities
-			C.capture_image('/home/human4/photobot/camera_image.jpeg')
+	    C = piggyphoto.camera()
+	    print C.abilities
+            C.capture_image('/home/human4/photobot/camera_image.jpg')
+            C.capture_preview('/home/human4/photobot/camera_image_prev.jpg')
         except e:
             print(e)
         else:
