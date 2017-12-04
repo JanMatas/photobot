@@ -6,8 +6,8 @@ using namespace std;
 ros::Publisher filtered_scan_pub;
 ros::Subscriber input_scan_sub;
 sensor_msgs::LaserScan filtered_scan;
-double lower_angle_ = -0.3;
-double upper_angle_ = 0.3;
+double lower_angle_ = -0.785;
+double upper_angle_ = 0.785;
 
 
 bool my_update(const sensor_msgs::LaserScan& input_scan)

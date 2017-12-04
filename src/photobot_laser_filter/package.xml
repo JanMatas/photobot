@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>laser_filter</name>
+  <name>photobot_laser_filter</name>
   <version>0.0.0</version>
-  <description>The laser_filter package</description>
+  <description>The photobot_laser_filter package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
@@ -19,7 +19,7 @@
   <!-- Url tags are optional, but multiple are allowed, one per tag -->
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/laser_filter</url> -->
+  <!-- <url type="website">http://wiki.ros.org/photobot_laser_filter</url> -->
 
 
   <!-- Author tags are optional, multiple are allowed, one per tag -->
