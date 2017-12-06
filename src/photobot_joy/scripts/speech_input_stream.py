@@ -77,12 +77,11 @@ class SpeechRecognizer(object):
         rospy.init_node('speech_input_node', disable_signals=True)
         self.pub = rospy.Publisher("speech_input", String, queue_size=10)
         self.sub = rospy.Subscriber("speech_input_enable", Bool, self.speech_input_enable)
+        self.sub_hints = rospy.Subscriber("speech_input_hints", String, self.speech_input_hints)
+        self.hints = []
+
         self.client = speech.SpeechClient()
-        config = types.RecognitionConfig(
-            encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
-            sample_rate_hertz=RATE,
-            language_code='en-us'
-        )
+
         self.streaming_config = types.StreamingRecognitionConfig(
             config=config,
             interim_results=False
@@ -151,20 +150,31 @@ class SpeechRecognizer(object):
                      continue
                  print "rms " + str(self.rms(window[-1]))
                  if self.rms(window[-1]) > 0.01:
-                     print "Sound detected, opening stream."
-                     audio_generator = self.chunk_generator(window, q, time.time())
-                     window = collections.deque(maxlen=10)
-                     requests = (types.StreamingRecognizeRequest(audio_content=content)
-                        for content in audio_generator)
-                     response_generator = self.client.streaming_recognize(self.streaming_config, requests)
-                     self.response_loop(response_generator)
-                     continue
+                      print "Sound detected, opening stream."
+                      audio_generator = self.chunk_generator(window, q, time.time())
+                      window = collections.deque(maxlen=10)
+                      requests = (types.StreamingRecognizeRequest(audio_content=content)
+                            for content in audio_generator)
+                      config = types.RecognitionConfig(
+                          encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
+                          sample_rate_hertz=RATE,
+                          language_code='en-us',
+                          speech_contexts=[speech.types.SpeechContext(
+                            phrases=self.hints,
+                          )],
+                      )
+                      response_generator = self.client.streaming_recognize(self.streaming_config, requests)
+                      self.response_loop(response_generator)
+                      continue
                  print "silent chunk"
+    
+
+    def speech_input_hints(self, data):
+         self.hints =  str(data.data).split(',')      
+        
     def speech_input_enable(self, data):
          print "listening is: "+ str(data.data)           
-         self.stop_listening = not data.data
-        
-           
+         self.stop_listening = not data.data           
     def stop(self):
         print "Waiting for thread to finish"
 
