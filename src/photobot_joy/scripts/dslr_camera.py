@@ -22,9 +22,6 @@ from cv_bridge import CvBridge, CvBridgeError
 import cv2
 
 
-
-
-
 class CamSaver(object):
 
     def __init__(self):
@@ -49,13 +46,13 @@ class CamSaver(object):
 	    C = piggyphoto.camera()
 	    print C.abilities
             C.capture_image('/home/human4/photobot/camera_image.jpg')
-            C.capture_preview('/home/human4/photobot/camera_image_prev.jpg')
         except e:
             print(e)
         else:
+
             # Save your OpenCV2 image as a jpeg 
             self.event_trigger.publish("Photo taken")
-
+            #self.image_pub.publish(self.bridge.cv2_to_imgmsg(cv_image, "bgr8"))
             #self.ui_publish.publish(img)
 
 

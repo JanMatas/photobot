@@ -10,18 +10,14 @@ class UiPublisher(object):
     def __init__(self):
         self.imagePub = rospy.Publisher("/image_base64", String)
         self.bridge = CvBridge()
-        self.image_sub = rospy.Subscriber("/image_ui",Image,self.callback)#/camera/rgb/image_color
+        self.image_sub = rospy.Subscriber("/event_trigger",String,self.callback)#/camera/rgb/image_color
         self.counter = 0
     def callback(self, msg):
-
-        try:
-            cv2_img = self.bridge.imgmsg_to_cv2(msg, "bgr8")
-            import cv2
-            retval, buffer = cv2.imencode('.jpg', cv2_img)
-            jpg_as_text = base64.b64encode(buffer)
+        if (if "taken" in msg.data):
+            filename='/home/human4/photobot/camera_image.jpg'
+            img_data = open(filename, 'rb').read()
+            jpg_as_text = base64.b64encode(img_data)
             self.imagePub.publish(str(jpg_as_text))
-        except CvBridgeError, e:
-            print e
 
 def main():
     rospy.init_node('ui')

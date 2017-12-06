@@ -36,7 +36,7 @@ def callback(data):
         body = email.mime.Text.MIMEText(text)
         msg.attach(body)
 
-        filename='/tmp/camera_image.jpeg'
+        filename='/home/human4/photobot/camera_image.jpg'
         img_data = open(filename, 'rb').read()
         image = MIMEImage(img_data, name=os.path.basename(filename))
         msg.attach(image)
