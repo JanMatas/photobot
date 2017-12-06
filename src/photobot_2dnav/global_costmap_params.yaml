@@ -1,0 +1,11 @@
+global_costmap:
+  global_frame: /map
+  robot_base_frame: base_link
+  update_frequency: 4.0
+  transform_tolerance: 1.0
+  # False if don't have an existing map
+  static_map: true
+  # rolling_window: false
+  # width: 6.0
+  # height: 6.0
+  # resolution: 0.05
