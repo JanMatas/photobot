@@ -1,9 +1,0 @@
-<launch>
-  <master auto="start"/>
-
-
-  <node pkg="rplidar_ros" type="rplidarNode" respawn="false" name="rplidar" output="screen">
-    <param name="serial_port" value="/dev/ttyUSB0" />
-    <param name="inverted" type="bool" value="true" />
-  </node>
-</launch>

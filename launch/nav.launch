@@ -1,0 +1,13 @@
+<launch>
+    <include file="rplidar.launch" />
+    <node name="RosAria" pkg="rosaria" type="RosAria">
+        <param name="~port" value="/dev/robot" />
+    </node>
+    <node name="joy_node" pkg="joy" type="joy_node" />
+    <node name="teleop" pkg="photobot_joy" type="teleop.py" />
+
+    <node name="map_server" pkg="map_server" type="map_server" args="/home/human4/photobot/maps/map.yaml"/>
+    <include file="../src/photobot_2dnav/move_base.launch" />
+    <include file="amcl_diff.launch" />
+
+</launch>
