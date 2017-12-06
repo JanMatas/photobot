@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import rospy
 import apiai
 import json
@@ -30,11 +31,25 @@ class DialogflowNode(object):
 
         self.speech_pub = rospy.Publisher("speech_output", String, queue_size=10)
         self.event_pub = rospy.Publisher("event_output", String, queue_size=10) 
+        self.sub_hints = rospy.Publisher("speech_input_hints", String, queue_size=10)
+
         self.request = None
+        self.hint_map = {"greeting-followup":"yes,no", 
+                        "greeting-yes-followup":"selfie,group photo",
+                        "greeting-yes-photo-now-photo-taken-followup":"it’s great,I love it",
+                        "greeting-yes-photo-now-photo-taken-yes-followup":"yes,no",
+                        "greeting-yes-photo-now-photo-taken-no-followup":"yes,no"}
 
     def publish_msgs_events(self, json_msg):
 
         parsed = json.loads(json_msg)
+       
+        ctxs = map(lambda x: x[u'name'], parsed["result"]["contexts"])
+        for context_hint in self.hint_map.keys():
+            if context_hint in ctxs:
+                hint_object = String()
+                hint_object.data = self.hint_map[context_hint]
+                self.sub_hints.publish(hint_object)
         response_string = parsed["result"]["fulfillment"]["speech"]
         print (response_string)
         action = parsed["result"]["action"]
@@ -88,9 +103,20 @@ class DialogflowNode(object):
         rospy.logdebug("Waiting for response...")
         response = self.request.getresponse()
         rospy.logdebug("Got response, and publishing it.")
-
-        self.publish_msgs_events(response.read())
         
+        self.publish_msgs_events(response.read())
+        try :
+            for context_hint in self.hint_map.keys():
+                if context_hint in map(lambda x: x["name"], parsed["result"]["contexts"]):
+                      print "here"
+                      hint_object = String()
+                      hint_object.data = self.hint_map[context_hint]
+                      print self.hint_map[context_hint]
+                      self.sub_hints.publish(hint_object)
+                else:
+                    print "not here"
+        except:
+             pass
        
         #try :
         #     if 'wants-picture' in parsed["result"]["contexts"]["name"]:
