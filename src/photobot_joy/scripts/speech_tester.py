@@ -1,15 +1,21 @@
 #!/usr/bin/env python
-
 import rospy
-from sensor_msgs.msg import Joy
+import time
+from std_msgs.msg import String
 from geometry_msgs.msg import Twist
 
+global star_time
+global acc
+acc = []
 def callback(data):
-        twist = Twist()
-        twist.linear.x = 4*data.axes[1]
-        twist.angular.z = 4*data.axes[0]
-        pub.publish(twist)
-
+    global acc
+    acc.append(time.time() - start_time)
+    print data.data
+    if data.data == "exit":
+        print sum(acc)/float(len(acc))
+def callback2(data):
+    global start_time
+    start_time = time.time()
 def listener():
 
     # In ROS, nodes are uniquely named. If two nodes with the same
@@ -18,10 +24,10 @@ def listener():
     # name for our 'listener' node so that multiple listeners can
     # run simultaneously.
     rospy.init_node('listener', anonymous=True)
-    global pub
-    pub = rospy.Publisher('RosAria/cmd_vel', Twist, queue_size=10)
-    rospy.Subscriber('joy', Joy, callback)
 
+    rospy.Subscriber('/speech_input', String, callback)
+    
+    rospy.Subscriber('/cmd_vel', Twist, callback2)
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
 
