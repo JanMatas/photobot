@@ -82,10 +82,6 @@ class SpeechRecognizer(object):
 
         self.client = speech.SpeechClient()
 
-        self.streaming_config = types.StreamingRecognitionConfig(
-            config=config,
-            interim_results=False
-        )
         self.thread_handle = None
 
     def rms(self, data):
@@ -163,7 +159,13 @@ class SpeechRecognizer(object):
                             phrases=self.hints,
                           )],
                       )
-                      response_generator = self.client.streaming_recognize(self.streaming_config, requests)
+  
+                      streaming_config = types.StreamingRecognitionConfig(
+                          config=config,
+                          interim_results=False
+                      )
+ 
+                      response_generator = self.client.streaming_recognize(streaming_config, requests)
                       self.response_loop(response_generator)
                       continue
                  print "silent chunk"
