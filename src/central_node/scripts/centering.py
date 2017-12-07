@@ -16,16 +16,23 @@ class CenteringNode(object):
     def __init__(self):
         rospy.init_node('centering_node')
         rospy.Subscriber("/filter_faceCoord", Int32MultiArray, self.callback, queue_size=10)
-      
-
+        rospy.Subscriber("/event_output", String, self.callback_trigger, queue_size=10)
+        self.enabled = False
+        
+        self.trigger_pub = rospy.Publisher("/event_output", String, queue_size=10)
         self.result_pub = rospy.Publisher("RosAria/cmd_vel", Twist, queue_size=10)
         #self.speech_pub = rospy.Publisher("speech_output", String, queue_size=10)
         #self.picture_pub = rospy.Publisher("take_picture", String, queue_size=10) 
         #self.request = None
         
 
-    def callback(self, msg):
+    def callback_trigger(self, msg):
+        if "Center" in msg.data:
+            self.enabled = True
         
+    def callback(self, msg):
+        if not self.enabled:
+            return
         data = msg.data
         twist = Twist()
         numOfFaces = data[1]
@@ -57,7 +64,11 @@ class CenteringNode(object):
                     self.result_pub.publish(twist)
                 else:
                     self.result_pub.publish(twist)
-
+                    self.enabled = False
+                    msg = String()
+                    msg.data = "photo"
+                    self.trigger_pub.publish(msg)
+ 
         elif numOfFaces > 1:
             meanFaceCenter_x = 0.0
             leftMost = data[2]
@@ -90,28 +101,15 @@ class CenteringNode(object):
                 else:
                     twist.linear.x = 0.0        
                 self.result_pub.publish(twist)
-
+                self.enabled = False
+                msg = String()
+                msg.data = "photo"
+                self.trigger_pub.publish(msg)
+ 
         else:
             self.result_pub.publish(twist)
-        
+   
        
-    
-        
-
-        #rospy.logdebug("Waiting for response...")
-        #rospy.logdebug("Got response, and publishing it.")
-
-        
-        
-        
-        
-        
-        
-        
-        #self.result_pub.publish(result_msg)
-        
-        #speech_object.data = response_string
-        #self.speech_pub.publish(speech_object)
 if __name__ == "__main__":
     _node = CenteringNode()
     rospy.spin()

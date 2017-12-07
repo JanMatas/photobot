@@ -54,7 +54,7 @@ class DialogflowNode(object):
         print (response_string)
         action = parsed["result"]["action"]
         if (action == "take_photo"):
-            trigger_msg = "Take photo, type: " + parsed["result"]["parameters"]["photo_type"]
+            trigger_msg = "Center, type: " + parsed["result"]["parameters"]["photo_type"]
             print (trigger_msg)
             event_object = String()
             event_object.data = trigger_msg

@@ -66,12 +66,12 @@ class FilterFacesNode(object):
         if self.SentTrigger and faceCounter == 0 :
             self. facePresentCounter += 1
 
-        if self.facePresentCounter  > 2*frameRate and not(self.SentTrigger):
+        if self.facePresentCounter  > 5*frameRate and not(self.SentTrigger):
             self.facePresent_pub.publish(True)
             self.SentTrigger = True
             self.facePresentCounter = 0
 
-        if self.facePresentCounter > 2*frameRate and self.SentTrigger :
+        if self.facePresentCounter > 6*frameRate and self.SentTrigger :
             self.facePresent_pub.publish(False)
             self.SentTrigger = False
             self.facePresentCounter = 0
