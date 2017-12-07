@@ -6,14 +6,44 @@ from geometry_msgs.msg import PointStamped
 clicked_points = []
 fname = 'clicked_points.txt'
 
+px = 0.0
+py = 0.0
+
+tolerance = 0.1
+initialized = False
 
 def callback(data):
+    """
+    Save points clicked on the map.
+    Points are saved as (dx, dy) from last point.
+    Initial point is assumed to be (0, 0).
+    The accumulated clicked points are dumped to file on every callback.
+    """
     global clicked_point
-    #  import pdb; pdb.set_trace();
+    global px
+    global py
+    global initialized
+
     x = data.point.x
     y = data.point.y
-    data_point = "{} {}\n".format(x, y)
+    dx = x - px
+    dy = y - dy
+
+    # Make sure subsequent points make sense
+    # First point must be the robot itself
+    if not initialized:
+        if dx > tolerance or dy > tolerance:
+            rospy.logerror("Ignoring point (%.2f, %.2f), too far away from O")
+        else:
+            initialized = True
+        return
+
+    px = x
+    py = y
+
+    data_point = "{} {}\n".format(dx, dy)
     rospy.loginfo("Got x: %f, y: %f", x, y)
+    rospy.loginfo("Saving as dx: %f, dy: %f", dx, dy)
     clicked_points.append(data_point)
     with open(fname, 'w') as f:
         f.writelines(clicked_points)
