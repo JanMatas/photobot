@@ -55,14 +55,15 @@ def start_node():
 
 
 def goto_goal(move_base, point):
+    timeout = 20
     goal = make_xy_goal(point)
     #start moving
     move_base.send_goal(goal)
-    #allow TurtleBot up to 60 seconds to complete task
-    success = move_base.wait_for_result(rospy.Duration(60)) 
+    #allow robot up to `timeout` seconds to complete the task
+    success = move_base.wait_for_result(rospy.Duration(timeout)) 
     if not success:
         move_base.cancel_goal()
-        rospy.loginfo("The base failed to move forward 3 meters for some reason")
+        rospy.loginfo("The base failed to reach goal in %d seconds", timeout)
     else:
         # We made it!
         state = move_base.get_state()
