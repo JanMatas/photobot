@@ -23,12 +23,12 @@ fname = 'clicked_points.txt'
 
 def load_goals():
     def to_xy(s):
-        s_ = s.split(', ')
-        return (float(s_[0], float(s_[1])))
+        s_ = s.split(' ')
+        return (float(s_[0]), float(s_[1]))
 
     with open(fname) as f:
         points = f.readlines()
-        return [to_xy(s) for p in points]
+        return [to_xy(p) for p in points]
 
 
 def make_xy_goal(point):

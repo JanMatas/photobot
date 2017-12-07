@@ -1,13 +1,11 @@
 <launch>
   <master auto="start"/>
 
-  <!-- Run the map server -->
-  <!-- <node name="map_server" pkg="map_server" type="map_server" args="$(find my_map_package)/lab_map.pgm my_map_resolution"/> -->
-
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
     <remap from="cmd_vel" to="RosAria/cmd_vel" />
     <remap from="odom" to="RosAria/pose" />
     <remap from="laser_scan_sensor" to="filtered_scan" />
+    <param name="laser_scan_sensor" value="filtered_scan" />
     <param name="conservative_reset_dist" value="0.5" />
 
     <rosparam file="$(find photobot_2dnav)/costmap_common_params.yaml" command="load" ns="global_costmap" />
