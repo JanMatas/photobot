@@ -36,6 +36,7 @@ def callback(data):
             rospy.logerror("Ignoring point (%.2f, %.2f), too far away from O")
         else:
             initialized = True
+            rospy.logerror("Accepted initial point")
         return
 
     px = x
