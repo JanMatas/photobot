@@ -27,13 +27,13 @@ def callback(data):
     x = data.point.x
     y = data.point.y
     dx = x - px
-    dy = y - dy
+    dy = y - py
 
     # Make sure subsequent points make sense
     # First point must be the robot itself
     if not initialized:
         if dx > tolerance or dy > tolerance:
-            rospy.logerror("Ignoring point (%.2f, %.2f), too far away from O")
+            rospy.loginfo("Ignoring point (%.2f, %.2f), too far away from O")
         else:
             initialized = True
         return
