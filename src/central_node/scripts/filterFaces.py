@@ -20,7 +20,7 @@ class FilterFacesNode(object):
         self.SentTrigger = False
 
         self.faceCoord_pub = rospy.Publisher("/filter_faceCoord", Int32MultiArray, queue_size=10)
-        self.facePresent_pub = rospy.Publisher("/event_trigger_tmp", Bool, queue_size=10)
+        self.facePresent_pub = rospy.Publisher("/face_detected", Bool, queue_size=10)
         #self.speech_pub = rospy.Publisher("speech_output", String, queue_size=10)
         #self.picture_pub = rospy.Publisher("take_picture", String, queue_size=10) 
         #self.request = None
