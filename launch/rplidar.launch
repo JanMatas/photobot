@@ -5,5 +5,7 @@
   <node pkg="rplidar_ros" type="rplidarNode" respawn="false" name="rplidar" output="screen">
     <param name="serial_port" value="/dev/rplidar" />
     <param name="frame_id" value="laser" />
+    <param name="inverted" value="true" type="bool" />
+
   </node>
 </launch>
