@@ -34,11 +34,11 @@ class DialogflowNode(object):
         self.sub_hints = rospy.Publisher("speech_input_hints", String, queue_size=10)
 
         self.request = None
-        self.hint_map = {"greeting-followup":"yes,no", 
-                        "greeting-yes-followup":"selfie,group photo",
-                        "greeting-yes-photo-now-photo-taken-followup":"it’s great,I love it",
-                        "greeting-yes-photo-now-photo-taken-yes-followup":"yes,no",
-                        "greeting-yes-photo-now-photo-taken-no-followup":"yes,no"}
+        self.hint_map = {"greeting-followup":"yes, no, please", 
+                        "greeting-yes-followup":"selfie, group photo, please",
+                        "greeting-yes-photo-now-photo-taken-followup":"it’s great, I love it, good, nice, cool",
+                        "greeting-yes-photo-now-photo-taken-yes-followup":"yes, no, please",
+                        "greeting-yes-photo-now-photo-taken-no-followup":"yes, no, please"}
 
     def publish_msgs_events(self, json_msg):
 
