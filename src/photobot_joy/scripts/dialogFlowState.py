@@ -32,6 +32,7 @@ class DialogflowNode(object):
         self.speech_pub = rospy.Publisher("speech_output", String, queue_size=10)
         self.event_pub = rospy.Publisher("event_output", String, queue_size=10) 
         self.sub_hints = rospy.Publisher("speech_input_hints", String, queue_size=10)
+        self.conv_end = rospy.Publisher("/interaction_complete", Bool, queue_size=10)
 
         self.request = None
         self.hint_map = {"greeting-followup":"yes, no, please", 
@@ -71,6 +72,10 @@ class DialogflowNode(object):
             event_object = String()
             event_object.data = trigger_msg
             self.event_pub.publish(event_object)
+        if (action == "end_conversation")
+            obj = Bool()
+            obj.data = True
+            self.conv_end.publish(obj)
 
         speech_object = String()
         speech_object.data = response_string
