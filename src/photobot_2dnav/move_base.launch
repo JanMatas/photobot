@@ -14,5 +14,5 @@
     <rosparam file="$(find photobot_2dnav)/global_costmap_params.yaml" command="load" />
     <rosparam file="$(find photobot_2dnav)/base_local_planner_params.yaml" command="load" />
   </node>
-<node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.1 0.0 0.0 0.0 0.0 3.14 base_link laser 100"/> -->
+<node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.1 0.0 0.0 0.0 0.0 3.14 base_link laser 10"/> -->
 </launch>

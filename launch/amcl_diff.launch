@@ -3,6 +3,11 @@
   <!-- Publish scans from best pose at a max of 10 Hz -->
   <param name="scan" value="filtered_scan" />
   <remap from="scan" to="filtered_scan" />
+
+  <param name="initial_pose_x" value="-1.350" />
+  <param name="initial_pose_y" value="0.317" />
+  <param name="initial_pose_a" value="-0.155" />
+
   <param name="odom_model_type" value="diff"/>
   <param name="odom_alpha5" value="0.1"/>
   <param name="transform_tolerance" value="0.2" />
