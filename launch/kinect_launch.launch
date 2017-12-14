@@ -26,6 +26,8 @@
     <param name="imageInput" value="/dev/ttyUSB1"/>
    </node> -->
 
+    <node name="filterFaces" pkg="central_node" type="filterFaces.py"> </node>
+    <node name="centering" pkg="central_node" type="centering.py"> </node>
 
 
 
