@@ -18,7 +18,7 @@ from std_msgs.msg import String
 def callback(data):
     rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
     if 'Send email' in data.data:
-        if len(data.data.split()) != 3 or not re.match(r"[^@]+@[^@]+\.[^@]+",  data.data.split()[2]):
+        if len(data.data.split()) != 4 or not re.match(r"[^@]+@[^@]+\.[^@]+",  data.data.split()[2]):
             print ("bad addresss entered")
             return
         address = data.data.split()[2]
@@ -26,7 +26,7 @@ def callback(data):
         send_to = address
         subject = 'picture'
         text = 'Hello, it was great meeting you today at level 5 labs. Please find the photo we have taken together attached. Until next time!'
-
+        filter_num = data.data.split()[3]
 
         msg = email.mime.Multipart.MIMEMultipart()
         msg['Subject'] = subject
@@ -35,8 +35,10 @@ def callback(data):
 
         body = email.mime.Text.MIMEText(text)
         msg.attach(body)
-
-        filename='/home/human4/photobot/camera_image.jpg'
+        if (filter_num == '0'):
+            filename='/home/human4/photobot/camera_image.jpg'
+        else:
+            filename='/home/human4/photobot/photo_' + filter_num + '.jpg'
         img_data = open(filename, 'rb').read()
         image = MIMEImage(img_data, name=os.path.basename(filename))
         msg.attach(image)

@@ -16,6 +16,7 @@ class FilterFacesNode(object):
     def __init__(self):
         rospy.init_node('facefilter_node')
         rospy.Subscriber("/faceCoord", Int32MultiArray, self.callback, queue_size=10)
+        rospy.Subscriber("/interaction_complete", Bool, self.callback2, queue_size=10)
         self.facePresentCounter = 0
         self.SentTrigger = False
 
@@ -24,6 +25,10 @@ class FilterFacesNode(object):
         #self.speech_pub = rospy.Publisher("speech_output", String, queue_size=10)
         #self.picture_pub = rospy.Publisher("take_picture", String, queue_size=10) 
         #self.request = None
+        
+    def callback2(self, msg):
+        self.SentTrigger = False
+        self.facePresentCounter = 0
         
 
     def callback(self, msg):
@@ -66,7 +71,7 @@ class FilterFacesNode(object):
         if self.SentTrigger and faceCounter == 0 :
             self. facePresentCounter += 1
 
-        if self.facePresentCounter  > 5*frameRate and not(self.SentTrigger):
+        if self.facePresentCounter  > 2*frameRate and not(self.SentTrigger):
             self.facePresent_pub.publish(True)
             self.SentTrigger = True
             self.facePresentCounter = 0
@@ -75,6 +80,7 @@ class FilterFacesNode(object):
             self.facePresent_pub.publish(False)
             self.SentTrigger = False
             self.facePresentCounter = 0
+        
         
         
         #speech_object.data = response_string

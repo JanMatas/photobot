@@ -42,24 +42,34 @@ class CenteringNode(object):
         if numOfFaces == 1:
             
             width = data[8]
+            height = data[9]
             faceCenter_x = data[6] + data[8]/2
             faceCenter_y = data[7] + data[9]/2
 
-            left_x = data[2]/3
-            right_x = 2*data[2]/3
+            centerConst = data[2]/15
+            left_x = data[2]/2 - centerConst
+            right_x = data[2]/2 + centerConst
+            
+                    
 
             if faceCenter_x < left_x:
                 twist.linear.x = 0.05
-                twist.angular.z = 3
+                twist.angular.z = abs(faceCenter_x - left_x)*0.01
                 self.result_pub.publish(twist)
                 
             elif faceCenter_x > right_x:
                 twist.linear.x = 0.05
-                twist.angular.z = -3
+                twist.angular.z = -abs(faceCenter_x - right_x)*0.01
                 self.result_pub.publish(twist)
             else:
                 #self.result_pub.publish(twist)
-                if (width < 70):
+                if (width*height < 4000):
+                    twist.linear.x = 0.1
+                    self.result_pub.publish(twist)
+                elif (width*height > 7000):
+                    twist.linear.x = -abs(width*height - 7000)*0.0001
+                    self.result_pub.publish(twist)
+                elif data[7] < height*0.4:
                     twist.linear.x = -0.1
                     self.result_pub.publish(twist)
                 else:
@@ -81,8 +91,9 @@ class CenteringNode(object):
                 if thisCenter < leftMost:
                     leftMost = thisCenter
             
-            left_x = data[2]/3
-            right_x = 2*data[2]/3
+            centerConst = data[2]/8
+            left_x = data[2]/2 - centerConst
+            right_x = data[2]/2 + centerConst
 
             if meanFaceCenter_x < left_x:
                 twist.linear.x = 0.05
