@@ -12,35 +12,63 @@ During our usual workflow, those branches are protected and we should never comm
 After you are done, you should create a pull request to develop branch and ask someone else to review it. When the code is approved (and both the author and reviewer are convinced it works), we merge to develop. Every week (or as required), we take code on *develop*, test it properly and merge to *master*.
 
 ## Dependencies:
-
-Some dependencies that need to be manually installed:
+We are using `ros-kinetic`
 
 - *pip packages* - gtts, playsound, apiai
 - *apt get* - ffmpeg
 ### Camera
-- *apt* - ros-kinetic-image-common 
+- ros-kinetic-image-common 
 ### RosAria
 - Get the package from http://robots.mobilerobots.com/ARIA/download/current/libaria_2.9.1a+ubuntu16_amd64.deb
 - Install it with dpkg -i libaria_2.9.1a+ubuntu16_amd64.deb
 - Go to /usr/local/Aria and run `make clean; make`
+- Run `sudo apt install ros-kinetic-rosaria`
+
 ### Navigation stack
 ```
 ros-kinetic-move-base
-ros-kinetic-depthimage-to-laserscan
-ros-kinetic-slam-gmapping
+ros-kinetic-gmapping
 ros-kinetic-map-server
+ros-kinetic-rplidar
 ```
 
-## Running RosAria
-`sudo chmod a+rwx /dev/ttyUSB0`
+## Running the robot
+You need to obtain Google API credentials to work with the speech API.
+Place them somewhere and point the `launch/credentials.txt` file to them.
 
-`sudo chmod a+rwx /dev/ttyUSB1`
+`source launch/credentials.txt` to export API keys
+`roslaunch kinect_launch.launch` to track faces and do centering when
+taking a picture
+`roslaunch face_detection_v1.launch` to run the speech services, website 
+and the emailer nodes
 
-`rosrun rosaria RosAria _port:=/dev/ttyUSB0` change to different USB if it doesn't work
+## Running the navigation
+We have created a `udev` rule to remap the names of lidar and the robot. We
+use these names in the `chmod-it.sh` file.
+To run the navigation stack (independent of other nodes) do:
+```
+cd launch
+sudo sh chmod-it.sh
+roslaunch nav.launch
+```
+With navigation stack up, run `rviz` and load the `awesome_conf.rviz`. This
+will show the map you have produced with `gmapping` and the initial robot
+position estimate. Now you need to do
+`rosrun photobot_navigation_goals record_goals.py` and the click on the points
+you want the robot to follow in subsequent runs.
+To make the robot start moving do:
+`rosrun photobot_navigation_goals move_around.py` which will follow the
+previously recorded points.
 
-## Running joystick
-`sudo chmod a+rwx /dev/input/js0`
+## Project structure
+### Navigation
+We have a `move_base` folder that includes configuration for the base ROS
+navigation stack, including robot dimensions and topic and coordinate frame
+names.
 
-`rosrun joy joy_node _dev:=/dev/input/js0`
+We have `photobot_laser_filter` node that restricts the angular output of 
+the laser scanner so that it doesn't include the parts of the robot in the scan.
 
-`rosrun photobot_joy teleop.py`
+There is `photobot_navigation_goals` package that has a node to record the 
+route for the robot and a node to follow that route and stop if there is 
+interaction with a person.
